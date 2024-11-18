@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leitor de QR Code</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #qr-reader {
+      margin: 20px auto;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:disabled {
+      background-color: gray;
+      cursor: not-allowed;
+    }
+
+    .alert {
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+</head>
+
+<body>
+  <h1>Leitor de QR Code</h1>
+  <p>Clique no botão abaixo para abrir a câmera e escanear o QR Code.</p>
+  <video id="qr-reader" autoplay muted playsinline></video>
+  <div id="status-message"></div>
+  <button id="stop-button" disabled>Parar Leitor</button>
+
+  <script>
+    const videoElement = document.getElementById("qr-reader");
+    const statusMessage = document.getElementById("status-message");
+    const stopButton = document.getElementById("stop-button");
+
+    let codeReader;
+
+    // Iniciar o leitor de QR Code
+    async function startQRReader() {
+      try {
+        // Inicializa o leitor ZXing
+        codeReader = new ZXing.BrowserQRCodeReader();
+        const videoInputDevices = await codeReader.listVideoInputDevices();
+
+        if (videoInputDevices.length === 0) {
+          statusMessage.innerHTML = `<p class="alert">Nenhuma câmera foi encontrada.</p>`;
+          return;
+        }
+
+        // Use a câmera traseira, se disponível
+        const selectedDeviceId = videoInputDevices[videoInputDevices.length - 1].deviceId;
+
+        // Começa a decodificar QR Codes do vídeo
+        codeReader.decodeFromVideoDevice(selectedDeviceId, videoElement, (result, err) => {
+          if (result) {
+            // Redireciona para o link contido no QR Code
+            window.location.href = result.text;
+          }
+          if (err && !(err instanceof ZXing.NotFoundException)) {
+            console.error("Erro ao processar QR Code:", err);
+            statusMessage.innerHTML = `<p class="alert">Erro ao decodificar o QR Code. Tente novamente.</p>`;
+          }
+        });
+
+        stopButton.disabled = false; // Habilitar botão de parada
+      } catch (error) {
+        console.error("Erro ao iniciar o leitor de QR Code:", error);
+        statusMessage.innerHTML = `<p class="alert">Erro ao acessar a câmera. Verifique as permissões.</p>`;
+      }
+    }
+
+    // Parar o leitor de QR Code
+    stopButton.addEventListener("click", () => {
+      if (codeReader) {
+        codeReader.reset();
+        videoElement.srcObject = null;
+        statusMessage.innerHTML = `<p class="alert">Leitor de QR Code parado.</p>`;
+        stopButton.disabled = true;
+      }
+    });
+
+    // Inicia o leitor quando a página carrega
+    startQRReader();
+  </script>
+</body>
+
+</html>
