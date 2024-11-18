@@ -1,0 +1,59 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('phpeste.png') no-repeat center center fixed;
+  background-size: cover;
+}
+#checkin-container {
+  background: #fff;
+  margin: 100px auto;
+  max-width: 400px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+h1 {
+  color: #910cab;
+}
+h1,
+p {
+  margin: 10px 0;
+}
+button {
+  display: inline-block;
+  padding: 15px 30px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  text-decoration: none;
+  background: linear-gradient(90deg, #0000ff, #ff00ff);
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
+.success {
+  color: green;
+  margin-top: 20px;
+}
+.error {
+  color: red;
+  margin-top: 20px;
+}
+.loading {
+  color: blue;
+  margin-top: 20px;
+}
+.warning {
+  color: orange;
+  margin: 15px 0;
+}
