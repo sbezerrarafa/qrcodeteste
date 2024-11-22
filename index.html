@@ -43,23 +43,56 @@
       checkinButton.disabled = true;
     }
 
-    // Simula o envio do check-in
-    checkinButton.addEventListener("click", () => {
-      checkinButton.disabled = true;
+    // Função para realizar o check-in
+    async function sendCheckin(eventId) {
+      try {
+        // Mostra mensagem de carregamento
+        resultMessage.innerHTML = `<span class="loading">Processando check-in...</span>`;
 
-      // Simula um tempo de resposta
-      setTimeout(() => {
-        // Gera o email fake
-        const fakeEmail = `usuario_${eventId}@exemplo.com`;
+        // Monta a URL do endpoint com o ID
+        const endpoint = `http://3.145.171.244:3001/checkin/${eventId}`;
+
+        // Faz a chamada ao endpoint
+        const response = await fetch(endpoint, {
+          method: "POST", // Define o método como POST
+          headers: { "Content-Type": "application/json" }
+        });
+
+        // Verifica a resposta
+        if (!response.ok) {
+          throw new Error(`Erro ao processar check-in: ${response.statusText}`);
+        }
+
+        // Obtém os dados da resposta
+        const data = await response.json();
 
         // Exibe a mensagem de sucesso
         resultMessage.innerHTML = `
-                    <span class="success">
-                        Check-in realizado com sucesso!<br>
-                        Email associado: <strong>${fakeEmail}</strong>
-                    </span>
-                `;
-      }, 1000);
+                <span class="success">
+                    Check-in realizado com sucesso!<br>
+                    Nome: <strong>${data.name || "Não informado"}</strong><br>
+                    Email: <strong>${data.email || "Não informado"}</strong><br>
+                    Status: <strong>${data.status || "Check-in confirmado!"}</strong>
+                </span>
+            `;
+
+        // Desabilita o botão após o check-in
+        checkinButton.disabled = true;
+      } catch (error) {
+        // Exibe erro
+        resultMessage.innerHTML = `
+                <span class="error">Erro: ${error.message}</span>
+            `;
+        checkinButton.disabled = false; // Reabilita para tentar novamente
+      }
+    }
+
+    // Adiciona o evento de clique no botão
+    checkinButton.addEventListener("click", () => {
+      if (!checkinButton.disabled) {
+        checkinButton.disabled = true; // Desativa o botão durante o envio
+        sendCheckin(eventId); // Faz o check-in
+      }
     });
   </script>
 </body>
